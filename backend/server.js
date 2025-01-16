@@ -12,24 +12,32 @@ import { app, server } from "./socket/socket.js";
 
 dotenv.config();
 
+// Resolve the directory name correctly
 const __dirname = path.resolve();
-// PORT should be assigned after calling dotenv.config() because we need to access the env variables. Didn't realize while recording the video. Sorry for the confusion.
+
+// Assign the port using environment variables or fallback to 5000
 const PORT = process.env.PORT || 5000;
 
-app.use(express.json()); // to parse the incoming requests with JSON payloads (from req.body)
+// Middleware to parse JSON and cookies
+app.use(express.json());
 app.use(cookieParser());
 
+// Backend API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")));
+// Serve static files from the correct frontend's `dist` directory
+const frontendPath = path.join(__dirname, "frontend", "dist");
+app.use(express.static(frontendPath));
 
+// Handle all other routes by serving the frontend's `index.html`
 app.get("*", (req, res) => {
-	res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
+// Start the server and connect to MongoDB
 server.listen(PORT, () => {
-	connectToMongoDB();
-	console.log(`Server Running on port ${PORT}`);
+  connectToMongoDB();
+  console.log(`Server Running on port ${PORT}`);
 });
