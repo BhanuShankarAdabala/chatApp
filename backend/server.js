@@ -12,11 +12,11 @@ import { app, server } from "./socket/socket.js";
 
 dotenv.config();
 
+// Use the PORT from the environment variable or default to 5000 if not provided
+const PORT = process.env.PORT || 5000; 
+
 // Resolve the directory name correctly
 const __dirname = path.resolve();
-
-// Assign the port using environment variables or fallback to 5000
-const PORT = process.env.PORT || 5000;
 
 // Middleware to parse JSON and cookies
 app.use(express.json());
@@ -27,7 +27,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 
-// Serve static files from the correct frontend's `dist` directory
+// Serve static files from the frontend's `dist` directory
 const frontendPath = path.join(__dirname, "frontend", "dist");
 app.use(express.static(frontendPath));
 
@@ -36,8 +36,8 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
-// Start the server and connect to MongoDB
+// Connect to MongoDB and start the server
 server.listen(PORT, () => {
   connectToMongoDB();
-  console.log(`Server Running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
